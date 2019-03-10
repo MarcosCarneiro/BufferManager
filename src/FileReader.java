@@ -8,7 +8,7 @@ public class FileReader {
 
 
     public static String getLine(int lineNumber){
-        String filePath = System.getProperty("user.home") + File.separator + "Documents" + File.separator + "bufferRegisters.txt";
+        String filePath = System.getProperty("user.home") + File.separator + "Documents" + File.separator + "arquivo.txt";
         return FileReader.readLine(filePath, lineNumber);
     }
 

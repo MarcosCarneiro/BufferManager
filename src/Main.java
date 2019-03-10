@@ -5,7 +5,7 @@ public class Main {
 
         bufferManager.fecth(1);
         bufferManager.fecth(10);
-        bufferManager.fecth(100);
+        bufferManager.fecth(20);
 
         bufferManager.displayCache();
 
