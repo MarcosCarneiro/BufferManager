@@ -2,13 +2,21 @@ public class Frame {
     private String page;
     private int hit;
     private int miss;
-    private int count;
+    private long count;
 
     public Frame(String page) {
         this.page = page;
         this.hit = 0;
         this.miss = 0;
         this.count = 0;
+    }
+
+    public void incrementHit(){
+        this.hit++;
+    }
+
+    public void incrementMiss(){
+        this.miss++;
     }
 
     public String getPage() {
@@ -35,11 +43,11 @@ public class Frame {
         this.miss = miss;
     }
 
-    public int getCount() {
+    public long getCount() {
         return count;
     }
 
-    public void setCount(int count) {
+    public void setCount(long count) {
         this.count = count;
     }
 
