@@ -45,6 +45,12 @@ public class BufferManager {
         else if(SubstitutionPolicy.CLOCK.equals(substitutionPolicy)){
             removeKey = this.clock();
         }
+        else if(SubstitutionPolicy.MRU.equals(substitutionPolicy)){
+            removeKey = this.mru();
+        }
+        else if(SubstitutionPolicy.FIFO.equals(substitutionPolicy)){
+            removeKey = this.fifo();
+        }
 
         buffer.remove(removeKey);
         String page = FileReader.getLine(key);
@@ -108,6 +114,48 @@ public class BufferManager {
         }
 
         return key;
+    }
+
+    private int mru()
+    {
+        Frame minFrame = new Frame("");
+        int minkey = 0;
+
+        for (Map.Entry<Integer, Frame> entry : buffer.entrySet()) {
+            Integer key = entry.getKey();
+            Frame frame = entry.getValue();
+
+            if (minkey == 0) {
+                minFrame = frame;
+                minkey = key;
+            } else if (frame.getInstantUse() > minFrame.getInstantUse()) {
+                minFrame = frame;
+                minkey = key;
+            }
+        }
+
+        return minkey;
+    }
+
+    private int fifo()
+    {
+        Frame minFrame = new Frame("");
+        int minkey = 0;
+
+        for (Map.Entry<Integer, Frame> entry : buffer.entrySet()) {
+            Integer key = entry.getKey();
+            Frame frame = entry.getValue();
+
+            if (minkey == 0) {
+                minFrame = frame;
+                minkey = key;
+            } else if (frame.getInstantUse() < minFrame.getInstantUse()) {
+                minFrame = frame;
+                minkey = key;
+            }
+        }
+
+        return minkey;
     }
 
     private void addClock(int key){
