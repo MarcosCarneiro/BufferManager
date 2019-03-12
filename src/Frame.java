@@ -2,13 +2,15 @@ public class Frame {
     private String page;
     private int hit;
     private int miss;
-    private long count;
+    private long instantUse;
+    private int clockBit;
 
     public Frame(String page) {
         this.page = page;
         this.hit = 0;
         this.miss = 0;
-        this.count = 0;
+        this.instantUse = 0;
+        this.clockBit = 1;
     }
 
     public void incrementHit(){
@@ -43,12 +45,24 @@ public class Frame {
         this.miss = miss;
     }
 
-    public long getCount() {
-        return count;
+    public long getInstantUse() {
+        return instantUse;
     }
 
-    public void setCount(long count) {
-        this.count = count;
+    public void setInstantUse(long instantUse) {
+        this.instantUse = instantUse;
+    }
+
+    public int getClockBit() {
+        return clockBit;
+    }
+
+    public void activeClockBit() {
+        this.clockBit = 1;
+    }
+
+    public void disabledClockBit(){
+        this.clockBit = 0;
     }
 
     @Override
@@ -57,7 +71,7 @@ public class Frame {
                 "page='" + page + '\'' +
                 ", hit=" + hit +
                 ", miss=" + miss +
-                ", count=" + count +
+                ", instantUse=" + instantUse +
                 '}';
     }
 }
