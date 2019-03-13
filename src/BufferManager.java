@@ -7,28 +7,32 @@ import java.util.concurrent.atomic.AtomicLong;
 public class BufferManager {
     private Map<Integer, Frame> buffer;
     private int BUFFER_LIMIT = 5;
-    private AtomicLong momentCount = new AtomicLong(1);
+    private AtomicLong instantUseCount = new AtomicLong(1);
+    private AtomicLong entryTimeCount = new AtomicLong(1);
     private SubstitutionPolicy substitutionPolicy;
     private List<Integer> clockList;
     private int currentClock;
+    private int hit = 0;
+    private int miss = 0;
 
-    public BufferManager() {
+    public BufferManager(SubstitutionPolicy substitutionPolicy) {
         this.buffer = new HashMap<>();
         this.clockList = new LinkedList<>();
         this.currentClock = 0;
-        substitutionPolicy = SubstitutionPolicy.CLOCK;
+        this.substitutionPolicy = substitutionPolicy;
     }
 
     public Frame fecth(int key){
         if(buffer.containsKey(key)){
             Frame frame = buffer.get(key);
-            frame.incrementHit();
+            this.hit++;
             return this.addToBuffer(frame, key);
         }
         else if(buffer.size() < BUFFER_LIMIT){
             String page = FileReader.getLine(key);
             Frame frame = new Frame(page);
-            frame.incrementMiss();
+            this.miss++;
+            frame.setEntryTime(entryTimeCount.getAndIncrement());
             return this.addToBuffer(frame, key);
         }
         else{
@@ -55,9 +59,11 @@ public class BufferManager {
         buffer.remove(removeKey);
         String page = FileReader.getLine(key);
         Frame frame = new Frame(page);
-        frame.incrementMiss();
+        this.miss++;
         frame.activeClockBit();
-        frame.setInstantUse(momentCount.getAndIncrement());
+        frame.setInstantUse(instantUseCount.getAndIncrement());
+        frame.setEntryTime(entryTimeCount.getAndIncrement());
+        frame.incrementAccessCount();
 
         int index = clockList.indexOf(removeKey);
         clockList.set(index, key);
@@ -66,6 +72,7 @@ public class BufferManager {
     }
 
     public void displayCache(){
+        System.out.println();
         buffer.forEach((key, frame) -> {
             System.out.println(key + " : " + frame.getPage());
         });
@@ -128,7 +135,7 @@ public class BufferManager {
             if (minkey == 0) {
                 minFrame = frame;
                 minkey = key;
-            } else if (frame.getInstantUse() > minFrame.getInstantUse()) {
+            } else if (frame.getAccessCount() < minFrame.getAccessCount()) {
                 minFrame = frame;
                 minkey = key;
             }
@@ -149,7 +156,7 @@ public class BufferManager {
             if (minkey == 0) {
                 minFrame = frame;
                 minkey = key;
-            } else if (frame.getInstantUse() < minFrame.getInstantUse()) {
+            } else if (frame.getEntryTime() < minFrame.getEntryTime()) {
                 minFrame = frame;
                 minkey = key;
             }
@@ -166,14 +173,15 @@ public class BufferManager {
 
     private Frame addToBuffer(Frame frame, int key){
         frame.activeClockBit();
-        frame.setInstantUse(momentCount.getAndIncrement());
+        frame.setInstantUse(instantUseCount.getAndIncrement());
+        frame.incrementAccessCount();
         this.addClock(key);
         return buffer.put(key, frame);
     }
 
     public void displayStats(){
-        buffer.forEach((key, frame) -> {
-            System.out.println(key + " : " + " hit = " + frame.getHit() + " miss = " + frame.getMiss() + " momento de uso = " + frame.getInstantUse());
-        });
+        System.out.println();
+        System.out.println("Hit: " + this.hit);
+        System.out.println("Miss: " + this.miss);
     }
 }
