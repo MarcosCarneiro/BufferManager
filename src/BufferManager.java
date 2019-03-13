@@ -125,44 +125,44 @@ public class BufferManager {
 
     private int mru()
     {
-        Frame minFrame = new Frame("");
-        int minkey = 0;
+        Frame maxFrame = new Frame("");
+        int maxKey = 0;
 
         for (Map.Entry<Integer, Frame> entry : buffer.entrySet()) {
             Integer key = entry.getKey();
             Frame frame = entry.getValue();
 
-            if (minkey == 0) {
-                minFrame = frame;
-                minkey = key;
-            } else if (frame.getAccessCount() < minFrame.getAccessCount()) {
-                minFrame = frame;
-                minkey = key;
+            if (maxKey == 0) {
+                maxFrame = frame;
+                maxKey = key;
+            } else if (frame.getInstantUse() > maxFrame.getInstantUse()) {
+                maxFrame = frame;
+                maxKey = key;
             }
         }
 
-        return minkey;
+        return maxKey;
     }
 
     private int fifo()
     {
         Frame minFrame = new Frame("");
-        int minkey = 0;
+        int minKey = 0;
 
         for (Map.Entry<Integer, Frame> entry : buffer.entrySet()) {
             Integer key = entry.getKey();
             Frame frame = entry.getValue();
 
-            if (minkey == 0) {
+            if (minKey == 0) {
                 minFrame = frame;
-                minkey = key;
+                minKey = key;
             } else if (frame.getEntryTime() < minFrame.getEntryTime()) {
                 minFrame = frame;
-                minkey = key;
+                minKey = key;
             }
         }
 
-        return minkey;
+        return minKey;
     }
 
     private void addClock(int key){
